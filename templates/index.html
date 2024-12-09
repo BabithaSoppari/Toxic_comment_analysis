@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Toxic Comments Classifier</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f7f6;
+            color: #333;
+        }
+        header {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            text-align: center;
+        }
+        h1 {
+            font-size: 30px;
+        }
+        .container {
+            max-width: 900px;
+            margin: 30px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        input[type="text"], input[type="file"] {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            font-size: 16px;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .result {
+            margin-top: 20px;
+        }
+        .result div {
+            margin-bottom: 10px;
+        }
+        .result img {
+            max-width: 100%;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .statistics {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+        }
+        .statistics h3 {
+            margin-top: 0;
+        }
+        .statistics p {
+            font-size: 18px;
+            line-height: 1.6;
+        }
+        .download-btn {
+            display: block;
+            margin-top: 20px;
+            text-align: center;
+        }
+        .download-btn a {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            font-size: 16px;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+        .download-btn a:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>Toxic Comments Classifier</h1>
+</header>
+
+<div class="container">
+    <h2>Check Toxicity of a Comment</h2>
+    <form action="/check_text" method="POST">
+        <div class="form-group">
+            <label for="comment_text">Enter Comment:</label>
+            <input type="text" id="comment_text" name="comment_text" required>
+        </div>
+        <button type="submit">Check Toxicity</button>
+    </form>
+
+    {% if result %}
+    <div class="result">
+        <h3>Analysis Result:</h3>
+        <div><strong>Comment:</strong> {{ result['comment'] }}</div>
+        <div><strong>Prediction:</strong> {{ result['svm_prediction'] }}</div>
+        <div><strong>Toxicity Probability:</strong> {{ result['svm_proba'] }}%</div>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Upload CSV Section -->
+<div class="container">
+    <h2>Upload CSV for Bulk Processing</h2>
+    <form action="/upload" method="POST" enctype="multipart/form-data">
+        <div class="form-group">
+            <label for="csv_file">Choose a CSV file:</label>
+            <input type="file" id="csv_file" name="csv_file" accept=".csv" required>
+        </div>
+        <button type="submit">Upload and Process</button>
+    </form>
+
+    {% if toxic_count is not none %}
+    <div class="statistics">
+        <h3>Summary Statistics</h3>
+        <p>Total Comments: {{ total_comments }}</p>
+        <p>Toxic Comments: {{ toxic_count }} ({{ toxic_percentage }}%)</p>
+        <p>Non-Toxic Comments: {{ non_toxic_count }} ({{ non_toxic_percentage }}%)</p>
+
+        <h3>Toxic vs Non-Toxic Chart</h3>
+        <img src="{{ chart_image }}" alt="Toxic vs Non-Toxic Chart">
+
+        <h3>Word Cloud</h3>
+        <img src="{{ wordcloud_image }}" alt="Word Cloud">
+
+        <div class="download-btn">
+            <a href="{{ url_for('download_file', filename=download_link) }}" download>Download Processed Data</a>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+</body>
+</html>
